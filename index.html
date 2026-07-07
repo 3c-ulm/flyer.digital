@@ -14,7 +14,7 @@
     --line:#e3e7eb;
     --ink:#1c2530;
     --sub:#75818c;
-    --accent:#ff7a33;
+    --accent:#178f6c;
 
     --c-buero:#3b7ce0;
     --c-werkstatt:#ff7a33;
@@ -39,10 +39,8 @@
     padding:22px 20px; box-shadow:var(--shadow);
   }
   .header-inner{ max-width:1500px; margin:0 auto; }
-  .eyebrow{
-    font-weight:700; letter-spacing:.22em; text-transform:uppercase;
-    color:var(--accent); font-size:12px;
-  }
+  .header-row{ display:flex; align-items:center; gap:18px; }
+  .header-logo{ width:56px; height:auto; flex:none; }
   h1{
     font-weight:800; font-size:clamp(24px,3.4vw,38px); margin:4px 0 6px; letter-spacing:-.01em;
   }
@@ -126,10 +124,12 @@
 <body>
 
 <header>
-  <div class="header-inner">
-    <div class="eyebrow">3C · Car Competence Center Ulm</div>
-    <h1>Standort &amp; Leistungen</h1>
-    <p>Unser Flyer und der interaktive Lageplan der Halle – alles auf einen Blick.</p>
+  <div class="header-inner header-row">
+    <img src="logo.png" alt="3C Logo" class="header-logo">
+    <div>
+      <h1>Standort &amp; Leistungen</h1>
+      <p>Unser Flyer und der interaktive Lageplan der Halle – alles auf einen Blick.</p>
+    </div>
   </div>
 </header>
 
