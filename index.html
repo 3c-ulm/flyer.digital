@@ -62,6 +62,33 @@
   }
   .flyer-card img{ display:block; width:100%; height:auto; border-radius:8px; }
 
+  .flip-wrap{ perspective:2200px; max-width:900px; margin:0 auto; }
+  .flip-card{
+    position:relative; width:100%; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .8s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped{ transform:rotateY(180deg); }
+  .flip-face{
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:12px; box-shadow:0 10px 40px rgba(20,30,40,.14);
+  }
+  .flip-face img{ display:block; width:100%; height:auto; border-radius:8px; pointer-events:none; }
+  .flip-front{ position:relative; z-index:2; }
+  .flip-back{ position:absolute; inset:0; transform:rotateY(180deg); }
+  .flip-hint{
+    display:flex; align-items:center; gap:8px; justify-content:center;
+    margin-top:14px; font-size:12.5px; color:var(--sub);
+  }
+  .flip-hint svg{ width:15px; height:15px; flex:none; }
+  .flip-badge{
+    position:absolute; top:10px; right:10px; z-index:3;
+    background:rgba(28,37,48,.72); color:#fff; font-size:11px; font-weight:600;
+    letter-spacing:.03em; padding:6px 10px; border-radius:20px;
+    display:flex; align-items:center; gap:5px; pointer-events:none;
+  }
+  .flip-badge svg{ width:12px; height:12px; }
+
   .stage{
     position:relative; background:var(--panel); border:1px solid var(--line); border-radius:14px;
     padding:10px; overflow:auto; box-shadow:var(--shadow);
@@ -109,16 +136,28 @@
 <main>
 
   <section>
-    <h2>Flyer — Vorderseite</h2>
-    <div class="flyer-card">
-      <img src="flyer-vorne.png" alt="3C Flyer Vorderseite">
+    <h2>Flyer</h2>
+    <div class="flip-wrap">
+      <div class="flip-card" id="flipCard">
+        <div class="flip-face flip-front">
+          <div class="flip-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v16M20 4v16M4 4h10a6 6 0 0 1 0 12H4M20 20h-10a6 6 0 0 1 0-12h10"/></svg>
+            Vorderseite
+          </div>
+          <img src="flyer-vorne.png.jpg" alt="3C Flyer Vorderseite">
+        </div>
+        <div class="flip-face flip-back">
+          <div class="flip-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v16M20 4v16M4 4h10a6 6 0 0 1 0 12H4M20 20h-10a6 6 0 0 1 0-12h10"/></svg>
+            Rückseite
+          </div>
+          <img src="flyer-hinten.png.jpg" alt="3C Flyer Rückseite">
+        </div>
+      </div>
     </div>
-  </section>
-
-  <section>
-    <h2>Flyer — Rückseite</h2>
-    <div class="flyer-card">
-      <img src="flyer-hinten.png" alt="3C Flyer Rückseite">
+    <div class="flip-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 2l4 4-4 4M3 12v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 12v1a4 4 0 0 1-4 4H3"/></svg>
+      Zum Wenden klicken
     </div>
   </section>
 
@@ -230,6 +269,9 @@ const ROOMS = [
     "h": 29.88760256552858
   }
 ];
+
+const flipCard = document.getElementById('flipCard');
+flipCard.addEventListener('click', ()=> flipCard.classList.toggle('flipped'));
 
 const imgbox = document.getElementById('imgbox');
 const roomsLayer = document.getElementById('roomsLayer');
