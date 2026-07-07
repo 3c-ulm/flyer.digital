@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3C Car Competence Center Ulm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --panel2:#f7f8fa;
+    --line:#e3e7eb;
+    --ink:#1c2530;
+    --sub:#75818c;
+    --accent:#ff7a33;
+
+    --c-buero:#3b7ce0;
+    --c-werkstatt:#ff7a33;
+    --c-lackierung:#e2443a;
+    --c-aufbereitung:#0fa3a3;
+    --c-parkplatz:#8b95a1;
+    --c-eingang:#d6a917;
+    --c-lager:#9a6bd6;
+
+    --shadow:0 1px 2px rgba(20,30,40,.04), 0 8px 24px rgba(20,30,40,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Mona Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  header{
+    background:var(--panel); border-bottom:1px solid var(--line);
+    padding:22px 20px; box-shadow:var(--shadow);
+  }
+  .header-inner{ max-width:1500px; margin:0 auto; }
+  .eyebrow{
+    font-weight:700; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--accent); font-size:12px;
+  }
+  h1{
+    font-weight:800; font-size:clamp(24px,3.4vw,38px); margin:4px 0 6px; letter-spacing:-.01em;
+  }
+  header p{ color:var(--sub); font-size:13.5px; max-width:760px; line-height:1.55; margin:0; }
+
+  main{ max-width:1500px; margin:0 auto; padding:28px 20px 70px; }
+
+  section{ margin-bottom:36px; }
+  section h2{
+    font-weight:700; font-size:14px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 14px;
+  }
+
+  .flyer-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:12px; box-shadow:var(--shadow);
+  }
+  .flyer-card img{ display:block; width:100%; height:auto; border-radius:8px; }
+
+  .stage{
+    position:relative; background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:10px; overflow:auto; box-shadow:var(--shadow);
+  }
+  .imgbox{ position:relative; display:inline-block; user-select:none; }
+  .imgbox img{ display:block; max-width:100%; height:auto; border-radius:6px; }
+
+  .room{ position:absolute; box-sizing:border-box; }
+  .room .fill{
+    position:absolute; inset:0; border-radius:3px;
+    background:transparent; border:0 solid transparent;
+    transition:background .12s ease, border-color .12s ease; cursor:pointer;
+  }
+  .room:hover .fill{
+    background:color-mix(in srgb, var(--roomcolor,#fff) 30%, transparent);
+    border:1px solid color-mix(in srgb, var(--roomcolor,#fff) 70%, transparent);
+  }
+
+  .tooltip{
+    position:absolute; z-index:50; pointer-events:none;
+    background:#ffffff; border:1px solid var(--line); border-radius:10px;
+    padding:10px 13px; max-width:260px; font-size:13px; line-height:1.5;
+    box-shadow:0 10px 30px rgba(20,30,40,.16); opacity:0; transform:translateY(4px);
+    transition:opacity .12s ease, transform .12s ease;
+  }
+  .tooltip.show{ opacity:1; transform:translateY(0); }
+  .tooltip h4{ margin:0 0 4px; font-weight:700; font-size:14.5px; color:var(--ink); }
+  .tooltip p{ margin:0; color:var(--sub); white-space:pre-wrap; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:8px 16px; font-size:12px; color:var(--sub); margin-top:12px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="eyebrow">3C · Car Competence Center Ulm</div>
+    <h1>Standort &amp; Leistungen</h1>
+    <p>Unser Flyer und der interaktive Lageplan der Halle – alles auf einen Blick.</p>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <h2>Flyer — Vorderseite</h2>
+    <div class="flyer-card">
+      <img src="flyer-vorne.png" alt="3C Flyer Vorderseite">
+    </div>
+  </section>
+
+  <section>
+    <h2>Flyer — Rückseite</h2>
+    <div class="flyer-card">
+      <img src="flyer-hinten.png" alt="3C Flyer Rückseite">
+    </div>
+  </section>
+
+  <section>
+    <h2>Interaktiver Lageplan</h2>
+    <div class="stage">
+      <div class="imgbox" id="imgbox">
+        <img id="planImg" src="halle.png" alt="Halle Lageplan" draggable="false">
+        <div id="roomsLayer"></div>
+        <div id="tooltip" class="tooltip"></div>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+</main>
+
+<script>
+const CATS = [
+  {id:'buero', label:'Büro', color:'var(--c-buero)'},
+  {id:'werkstatt', label:'Werkstatt', color:'var(--c-werkstatt)'},
+  {id:'lackierung', label:'Lackierungbereich', color:'var(--c-lackierung)'},
+  {id:'aufbereitung', label:'Aufbereitungsbereich', color:'var(--c-aufbereitung)'},
+  {id:'parkplatz', label:'Parkplatz', color:'var(--c-parkplatz)'},
+  {id:'eingang', label:'Eingang', color:'var(--c-eingang)'},
+  {id:'lager', label:'Lager', color:'var(--c-lager)'},
+];
+function catColor(id){ const c = CATS.find(c=>c.id===id); return c ? c.color : '#fff'; }
+
+const ROOMS = [
+  {
+    "id": "r1_mraaa2gz",
+    "name": "Lackierungsbereich",
+    "description": "Lackierungsbereich mit moderner Lackierkabine für professionelle Fahrzeuglackierungen.",
+    "cat": "lackierung",
+    "left": 0.5976095617529881,
+    "top": 48.493729449739384,
+    "w": 29.79388751301102,
+    "h": 37.872167089845384
+  },
+  {
+    "id": "r2_mraabtaw",
+    "name": "BDX Unfallgutachten",
+    "description": "Kfz-Sachverständigenbüro für Unfallgutachten, Schadenbewertung und Fahrzeugbewertung.",
+    "cat": "buero",
+    "left": 30.292792792792795,
+    "top": 48.830548879110594,
+    "w": 9.234234234234235,
+    "h": 37.350742968769964
+  },
+  {
+    "id": "r3_mraadbcr",
+    "name": "Aufbereitungsbereich",
+    "description": "Fahrzeugaufbereitung: Politur, Reinigung und professionelles Detailing.",
+    "cat": "aufbereitung",
+    "left": 39.52702702702703,
+    "top": 48.25812588314136,
+    "w": 29.39189189189189,
+    "h": 37.78006185346847
+  },
+  {
+    "id": "r4_mraafibs",
+    "name": "KFZ-Werkstatt",
+    "description": "Fahrzeugreparatur, Wartung und technische Instandsetzung.",
+    "cat": "werkstatt",
+    "left": 68.91891891891892,
+    "top": 48.54433738112598,
+    "w": 12.837837837837837,
+    "h": 37.350742968769964
+  },
+  {
+    "id": "r5_mraal1fi",
+    "name": "Parkplatz A",
+    "description": "",
+    "cat": "parkplatz",
+    "left": 19.55201094376045,
+    "top": -0.013569378947574274,
+    "w": 14.61655192471191,
+    "h": 48.63067536086007
+  },
+  {
+    "id": "r6_mraalhoj",
+    "name": "Parkplatz B",
+    "description": "",
+    "cat": "parkplatz",
+    "left": 37.09187325341475,
+    "top": 0.20352908975709383,
+    "w": 24.44950503769992,
+    "h": 48.12410582585111
+  },
+  {
+    "id": "r7_mraalztd",
+    "name": "Parkplatz C",
+    "description": "",
+    "cat": "parkplatz",
+    "left": 63.26878897312608,
+    "top": -0.08593811172835704,
+    "w": 36.67425755654989,
+    "h": 48.12410582585111
+  },
+  {
+    "id": "r8_mraanr95",
+    "name": "Parkplatz D",
+    "description": "",
+    "cat": "parkplatz",
+    "left": 81.87167324094123,
+    "top": 57.15641934428402,
+    "w": 18.071373288734726,
+    "h": 29.88760256552858
+  }
+];
+
+const imgbox = document.getElementById('imgbox');
+const roomsLayer = document.getElementById('roomsLayer');
+const tooltip = document.getElementById('tooltip');
+const legendEl = document.getElementById('legend');
+
+legendEl.innerHTML = CATS.map(c=>`<span><i style="background:${c.color}"></i>${c.label}</span>`).join('');
+
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+ROOMS.forEach(r=>{
+  const el = document.createElement('div');
+  el.className = 'room';
+  el.style.left = r.left+'%'; el.style.top = r.top+'%';
+  el.style.width = r.w+'%'; el.style.height = r.h+'%';
+  el.style.setProperty('--roomcolor', catColor(r.cat));
+
+  const fill = document.createElement('div');
+  fill.className = 'fill';
+  el.appendChild(fill);
+
+  el.addEventListener('mouseenter', ()=>{
+    tooltip.innerHTML = `<h4>${escapeHtml(r.name||'Unbenannt')}</h4>${r.description ? '<p>'+escapeHtml(r.description)+'</p>' : ''}`;
+    tooltip.classList.add('show');
+  });
+  el.addEventListener('mousemove', (e)=>{
+    const rect = imgbox.getBoundingClientRect();
+    tooltip.style.left = (e.clientX - rect.left + 16) + 'px';
+    tooltip.style.top = (e.clientY - rect.top + 12) + 'px';
+  });
+  el.addEventListener('mouseleave', ()=>{
+    tooltip.classList.remove('show');
+  });
+
+  roomsLayer.appendChild(el);
+});
+</script>
+</body>
+</html>
